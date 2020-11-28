@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.mobProofCrystals.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "EndCrystalMixin"
+  ],
+  "client": [
+  ],
+  "server": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
