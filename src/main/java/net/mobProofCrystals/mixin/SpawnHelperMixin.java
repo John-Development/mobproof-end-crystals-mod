@@ -17,8 +17,10 @@ import net.minecraft.world.biome.SpawnSettings;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 
+import net.mobProofCrystals.mobProofCrystals;
+
 @Mixin(SpawnHelper.class)
-public abstract class EndCrystalMixin {
+public abstract class SpawnHelperMixin {
 
   @Inject(
     method = "canSpawn",
@@ -41,16 +43,27 @@ public abstract class EndCrystalMixin {
       monsterY = blockPos.getY();
       monsterZ = blockPos.getZ();
 
-      Box box = new Box(monsterX + 32, monsterY + 1, monsterZ + 32, monsterX - 32, monsterY - 63, monsterZ - 32);
+      int radius = (int) mobProofCrystals.globalConfig.get("radius");
+      int lowerLimitDistance = (int) mobProofCrystals.globalConfig.get("lowerLimitDistance");
+
+      // Box box = new Box(monsterX + 32, monsterY + 1, monsterZ + 32, monsterX - 32, monsterY - 63, monsterZ - 32); DEFAULT
+      Box box = new Box(
+        monsterX + radius,
+        monsterY + lowerLimitDistance,
+        monsterZ + radius,
+        monsterX - radius,
+        monsterY - 2 * radius - lowerLimitDistance,
+        monsterZ - radius
+      );
 
       List<EndCrystalEntity> crystals = world.getEntitiesByClass(EndCrystalEntity.class, box, null);
 
       if (crystals != null && !crystals.isEmpty()) {
         cir.setReturnValue(false);
-          return;
+        return;
       }
     }
-      return;
+    return;
   }
   
 }
