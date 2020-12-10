@@ -4,8 +4,7 @@
   "package": "net.mobProofCrystals.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "SpawnHelperMixin",
-    "NameTagMixin"
+    "SpawnHelperMixin"
   ],
   "client": [
   ],
