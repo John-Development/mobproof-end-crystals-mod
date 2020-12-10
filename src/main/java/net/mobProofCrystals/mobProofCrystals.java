@@ -12,6 +12,12 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import net.fabricmc.api.ModInitializer;
+// import net.minecraft.item.ItemStack;
+// import net.minecraft.item.Items;
+// import net.minecraft.text.Text;
+// import net.minecraft.util.ActionResult;
+// import com.mojang.blaze3d.platform.;
+// import net.minecraft.util.Hand;
 
 public class mobProofCrystals implements ModInitializer {
 
@@ -48,5 +54,19 @@ public class mobProofCrystals implements ModInitializer {
     } catch (IOException e) {
       e.printStackTrace();
     }
+
+    // nameTagCrystalCallback.EVENT.register((player, crystal) -> {
+
+    //   System.out.println("patata" + crystal);
+    //   crystal.setCustomNameVisible(true);
+    //   crystal.setCustomName(Text.of("patata"));
+
+    //   ItemStack itemStack = player.getStackInHand(Hand.MAIN_HAND);
+    //   ItemStack itemStack2 = player.getStackInHand(Hand.OFF_HAND);
+
+    //   // if (itemStack == Item.)
+   
+    //   return ActionResult.SUCCESS;
+    // });
   }
 }

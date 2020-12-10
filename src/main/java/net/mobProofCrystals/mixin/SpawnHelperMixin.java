@@ -20,7 +20,7 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.mobProofCrystals.mobProofCrystals;
 
 @Mixin(SpawnHelper.class)
-public abstract class EndCrystalMixin {
+public abstract class SpawnHelperMixin {
 
   @Inject(
     method = "canSpawn",
@@ -60,10 +60,10 @@ public abstract class EndCrystalMixin {
 
       if (crystals != null && !crystals.isEmpty()) {
         cir.setReturnValue(false);
-          return;
+        return;
       }
     }
-      return;
+    return;
   }
   
 }
