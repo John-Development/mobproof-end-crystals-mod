@@ -17,7 +17,7 @@ import net.minecraft.world.biome.SpawnSettings;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 
-import net.mobProofCrystals.mobProofCrystals;
+import net.mobProofCrystals.util.PropertiesCache;
 
 @Mixin(SpawnHelper.class)
 public abstract class SpawnHelperMixin {
@@ -43,8 +43,9 @@ public abstract class SpawnHelperMixin {
       monsterY = blockPos.getY();
       monsterZ = blockPos.getZ();
 
-      int radius = (int) mobProofCrystals.globalConfig.get("radius");
-      int lowerLimitDistance = (int) mobProofCrystals.globalConfig.get("lowerLimitDistance");
+      PropertiesCache cache = PropertiesCache.getInstance();
+      int radius = Integer.parseInt(cache.getProperty("radius"));
+      int lowerLimitDistance = Integer.parseInt(cache.getProperty("lower-limit-distance"));
 
       // Box box = new Box(monsterX + 32, monsterY + 1, monsterZ + 32, monsterX - 32, monsterY - 63, monsterZ - 32); DEFAULT
       Box box = new Box(
