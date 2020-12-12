@@ -11,7 +11,7 @@ public class mobProofCrystals implements ModInitializer {
 
   final public static String DEF_RAD = "32";
   final public static String DEF_LIM_DISTANCE = "1";
-  final public static String DEF_CRYSTAL_NAME = "spawnkill";
+  final public static String DEF_CRYSTAL_NAME = "";
   final public static String CONFIG_FILE = "crystal.properties";
   @Override
   public void onInitialize() {
