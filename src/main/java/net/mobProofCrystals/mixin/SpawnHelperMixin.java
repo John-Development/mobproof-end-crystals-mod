@@ -1,6 +1,7 @@
 package net.mobProofCrystals.mixin;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -47,7 +48,6 @@ public abstract class SpawnHelperMixin {
       int radius = Integer.parseInt(cache.getProperty("radius"));
       int lowerLimitDistance = Integer.parseInt(cache.getProperty("lower-limit-distance"));
 
-      // Box box = new Box(monsterX + 32, monsterY + 1, monsterZ + 32, monsterX - 32, monsterY - 63, monsterZ - 32); DEFAULT
       Box box = new Box(
         monsterX + radius,
         monsterY + lowerLimitDistance,
@@ -57,9 +57,17 @@ public abstract class SpawnHelperMixin {
         monsterZ - radius
       );
 
-      List<EndCrystalEntity> crystals = world.getEntitiesByClass(EndCrystalEntity.class, box, null);
-
-      if (crystals != null && !crystals.isEmpty()) {
+      List<EndCrystalEntity> crystals = world.getEntitiesByClass(EndCrystalEntity.class, box, new Predicate<EndCrystalEntity>() {
+        @Override
+          public boolean test(EndCrystalEntity crystal) {
+            return (cache.getProperty("crystal-name").isBlank())
+              ? cache.getProperty("crystal-name").equals(crystal.getName().asString())
+              : true;
+          }
+        }
+      );
+      
+      if (!crystals.isEmpty()) {
         cir.setReturnValue(false);
         return;
       }
