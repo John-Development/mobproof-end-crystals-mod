@@ -60,7 +60,7 @@ public abstract class SpawnHelperMixin {
       List<EndCrystalEntity> crystals = world.getEntitiesByClass(EndCrystalEntity.class, box, new Predicate<EndCrystalEntity>() {
         @Override
           public boolean test(EndCrystalEntity crystal) {
-            return (!cache.getProperty("crystal-name").isBlank())
+            return (!cache.getProperty("crystal-name").trim().isEmpty())
               ? cache.getProperty("crystal-name").equals(crystal.getName().asString())
               : true;
           }
