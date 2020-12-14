@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.NameTagItem;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.mobProofCrystals.util.PropertiesCache;
 
 @Mixin(PlayerEntity.class)
 public abstract class NameTagMixin {
@@ -27,11 +28,13 @@ public abstract class NameTagMixin {
     CallbackInfoReturnable<ActionResult> cir
   ) {
     ItemStack itemStack = ((PlayerEntity) (Object) this).getStackInHand(hand);
+    PropertiesCache cache = PropertiesCache.getInstance();
 
     if (itemStack.getItem().getClass().equals(NameTagItem.class)
     && itemStack.hasCustomName()
     && entity instanceof EndCrystalEntity
-    && !((EndCrystalEntity) entity).getShowBottom()) {
+    && !((EndCrystalEntity) entity).getShowBottom()
+    && cache.getProperty("crystal-name").equals(itemStack.getName().asString())) {
       entity.setCustomName(itemStack.getName());
 
       itemStack.decrement(1);
