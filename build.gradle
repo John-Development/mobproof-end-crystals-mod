@@ -1,6 +1,8 @@
 plugins {
 	id 'fabric-loom' version '0.5-SNAPSHOT'
 	id 'maven-publish'
+	// id 'java'
+  // id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -21,6 +23,10 @@ dependencies {
 
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.
+
+  // shadow 'org.apache.commons:commons-configuration2:2.7'
+  // implementation group: 'org.apache.commons', name: 'commons-configuration2', version: '2.7'
+  // include 'org.apache.commons:commons-configuration2:2.7'
 }
 
 processResources {
@@ -53,6 +59,34 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 }
+
+// shadowJar {
+//   archiveBaseName.set('mob-proof-crystals')
+//   relocate 'org.apache', 'org.mobProofCrystals.apache'
+//   dependencies {
+    // exclude(dependency('com.google.*:.*:.*'))
+    // exclude(dependency('com.ibm.*:.*:.*'))
+    // exclude(dependency('com.mojang.*:.*:.*'))
+    // exclude(dependency('data.*:.*:.*'))
+    // exclude(dependency('io.*:.*:.*'))
+    // exclude(dependency('it.*:.*:.*'))
+    // exclude(dependency('javax.*:.*:.*'))
+    // exclude(dependency('net.sf.jopt-simple.*:.*:.*'))
+    // exclude(dependency('ui.*:.*:.*'))
+    // exclude(dependency('org.jline.*:.*:.*'))
+    // exclude(dependency('org.lwjgl.*:.*:.*'))
+    // exclude(dependency('org.apache.logging.*:.*:.*'))
+    // exclude(dependency('org.apache.http.*:.*:.*'))
+    // exclude(dependency('net.fabricmc.*:.*:.*'))
+    // exclude(dependency('net.minecraft.*:.*:.*'))
+    // exclude(dependency('net.java.*:.*:.*'))
+    // exclude(dependency('net.minecrell.*:.*:.*'))
+    // exclude(dependency('oshi.*:.*:.*'))
+    // exclude(dependency('com.springsource.org.objectweb.*:.*:.*'))
+    // exclude(dependency('mappings.*:.*:.*'))
+    // exclude(dependency('org.objectweb.asm.*:.*:.*'))
+//   }
+// }
 
 jar {
 	from("LICENSE") {

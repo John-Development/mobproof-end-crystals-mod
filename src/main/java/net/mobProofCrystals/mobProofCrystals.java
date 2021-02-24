@@ -7,15 +7,21 @@ import java.io.IOException;
 import net.fabricmc.api.ModInitializer;
 import net.mobProofCrystals.util.PropertiesCache;
 
+import static net.mobProofCrystals.util.PropertiesCache.CONFIG_FILE;
+
 public class mobProofCrystals implements ModInitializer {
 
   final public static String DEF_RAD = "32";
   final public static String DEF_LIM_DISTANCE = "1";
   final public static String DEF_CRYSTAL_NAME = "";
-  final public static String CONFIG_FILE = "crystal.properties";
+  final public static String DEPRECATED_CONFIG_FILE = "crystal.properties";
   @Override
   public void onInitialize() {
     try {
+      File deprecatedConfigFile = new File(DEPRECATED_CONFIG_FILE);
+      if (deprecatedConfigFile.isFile()) {
+        deprecatedConfigFile.renameTo(new File(CONFIG_FILE));
+      }
       File configFile = new File(CONFIG_FILE);
       // If config file does not exists creates a new one with the default values
       configFile.createNewFile();

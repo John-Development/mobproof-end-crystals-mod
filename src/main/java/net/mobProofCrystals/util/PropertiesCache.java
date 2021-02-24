@@ -11,8 +11,9 @@ import java.util.Set;
  
 public class PropertiesCache {
   private final Properties configProp = new Properties();
-  final public static String CONFIG_FILE = "crystal.properties";
-  
+  final public static String CONFIG_FILE = "config/crystal.properties";
+  private final String defaultConfig = "radius specifies the radius of the cube\nlower-limit-distance specifies the distance between the crystal and the lower border of the area\nset crystal-name to a value to make only renamed end crystals (with a nametag) to be be spawn proofing";
+
   private PropertiesCache() {
     try {
       InputStream in = new FileInputStream(CONFIG_FILE);
@@ -22,7 +23,6 @@ public class PropertiesCache {
     }
   }
 
-  //Bill Pugh Solution for singleton pattern
   private static class LazyHolder {
     private static final PropertiesCache INSTANCE = new PropertiesCache();
   }
@@ -49,7 +49,7 @@ public class PropertiesCache {
    
   public void flush() throws FileNotFoundException, IOException {
     try (final OutputStream outputstream = new FileOutputStream(CONFIG_FILE);) {
-      configProp.store(outputstream, "File Updated");
+      configProp.store(outputstream, defaultConfig);
       outputstream.close();
     }
   }
