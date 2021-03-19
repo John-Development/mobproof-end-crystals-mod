@@ -2,8 +2,8 @@ package net.mobProofCrystals;
 
 import java.io.IOException;
 
-
 import net.fabricmc.api.ModInitializer;
+import net.mobProofCrystals.commands.GameRuleCustomCommand;
 import net.mobProofCrystals.util.PropertiesCache;
 
 public class mobProofCrystals implements ModInitializer {
@@ -27,6 +27,9 @@ public class mobProofCrystals implements ModInitializer {
       
       //Write to the file
       PropertiesCache.getInstance().flush();
+
+      // Init commands
+      GameRuleCustomCommand.getInstance().init();
     } catch (IOException e) {
       e.printStackTrace();
     }
