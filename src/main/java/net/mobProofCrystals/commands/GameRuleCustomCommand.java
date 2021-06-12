@@ -107,7 +107,7 @@ public class GameRuleCustomCommand {
     Collection<String> collection = resourcePackManager.getEnabledNames();
     Collection<String> collection2 = getResourcePacks(resourcePackManager, saveProperties, collection);
     serverCommandSource.sendFeedback(new TranslatableText("commands.custom.reload.success"), true);
-    ReloadCommand.method_29480(collection2, serverCommandSource);
+    ReloadCommand.tryReloadDataPacks(collection2, serverCommandSource);
     return 1;
   }
 

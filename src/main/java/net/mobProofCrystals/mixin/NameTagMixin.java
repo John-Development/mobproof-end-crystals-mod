@@ -33,7 +33,7 @@ public abstract class NameTagMixin {
     if (itemStack.getItem().getClass().equals(NameTagItem.class)
     && itemStack.hasCustomName()
     && entity instanceof EndCrystalEntity
-    && !((EndCrystalEntity) entity).getShowBottom()
+    && !((EndCrystalEntity) entity).shouldShowBottom()
     && cache.getProperty("crystal-name").equals(itemStack.getName().asString())) {
       entity.setCustomName(itemStack.getName());
 
