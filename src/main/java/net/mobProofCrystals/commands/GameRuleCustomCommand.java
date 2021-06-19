@@ -21,9 +21,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 public class GameRuleCustomCommand {
-
-  private PropertiesCache cache = PropertiesCache.getInstance();
-
   private static class LazyHolder {
     private static final GameRuleCustomCommand INSTANCE = new GameRuleCustomCommand();
   }
@@ -69,6 +66,8 @@ public class GameRuleCustomCommand {
   }
 
   private int executeCrystal(CommandContext<ServerCommandSource> context) {
+    PropertiesCache cache = PropertiesCache.getInstance();
+
     Integer radius = null;
     Integer lowDistance = null;
     String name = null;
