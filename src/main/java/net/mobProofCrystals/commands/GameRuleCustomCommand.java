@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.server.MinecraftServer;
@@ -14,15 +13,15 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.world.SaveProperties;
 import net.mobProofCrystals.util.PropertiesCache;
 
-import static net.minecraft.server.command.CommandManager.*;
-
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
+
+import static net.minecraft.server.command.CommandManager.argument;
+import static net.minecraft.server.command.CommandManager.literal;
 
 public class GameRuleCustomCommand {
 
-  private PropertiesCache cache = PropertiesCache.getInstance();
+  private final PropertiesCache cache = PropertiesCache.getInstance();
 
   private static class LazyHolder {
     private static final GameRuleCustomCommand INSTANCE = new GameRuleCustomCommand();
@@ -38,49 +37,43 @@ public class GameRuleCustomCommand {
 
   // Command example: /gamerule doEndCrystalsLimitSpawn <radius> <lowDistance> <name>
   private void doEndCrystalsLimitSpawnInit() {
-    CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+    CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) ->
       dispatcher.register(literal("gamerule")
       .requires(source -> source.hasPermissionLevel(4))
         .then(literal("doEndCrystalsLimitSpawn")
           .then(argument("name", StringArgumentType.string())
-            .executes(context -> {
-              return executeCrystal(context);
-            })
+            .executes(this::executeCrystal)
           )
           .then(argument("radius", IntegerArgumentType.integer(1, 64))
             .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
-              .executes(context -> {
-                return executeCrystal(context);
-              })
+              .executes(this::executeCrystal)
             )
           )
           .then(argument("radius", IntegerArgumentType.integer(1, 64))
             .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
               .then(argument("name", StringArgumentType.string())
-                .executes(context -> {
-                  return executeCrystal(context);
-                })
+                .executes(this::executeCrystal)
               )
             )
           )
         )
-      );
-    });
+      )
+    );
   }
 
   private int executeCrystal(CommandContext<ServerCommandSource> context) {
-    Integer radius = null;
-    Integer lowDistance = null;
-    String name = null;
+    int radius;
+    int lowDistance;
+    String name;
     
     try {
       radius = IntegerArgumentType.getInteger(context, "radius");
-      cache.setProperty("radius", radius.toString());
-    } catch (Exception e) {}
+      cache.setProperty("radius", Integer.toString(radius));
+    } catch (Exception ignored) {}
     try {
       lowDistance = IntegerArgumentType.getInteger(context, "lowDistance");
-      cache.setProperty("lower-limit-distance", lowDistance.toString());
-    } catch (Exception e) {}
+      cache.setProperty("lower-limit-distance", Integer.toString(lowDistance));
+    } catch (Exception ignored) {}
     try {
       name = StringArgumentType.getString(context, "name");
       if (name.equals("-")) {
@@ -88,7 +81,7 @@ public class GameRuleCustomCommand {
       } else {
         cache.setProperty("crystal-name", name);
       }
-    } catch (Exception e) {}
+    } catch (Exception ignored) {}
     
     try {
       cache.flush();
@@ -100,8 +93,8 @@ public class GameRuleCustomCommand {
   }
 
   private static int reload(CommandContext<ServerCommandSource> context) {
-    ServerCommandSource serverCommandSource = (ServerCommandSource) context.getSource();
-    MinecraftServer minecraftServer = serverCommandSource.getMinecraftServer();
+    ServerCommandSource serverCommandSource = context.getSource();
+    MinecraftServer minecraftServer = serverCommandSource.getServer();
     ResourcePackManager resourcePackManager = minecraftServer.getDataPackManager();
     SaveProperties saveProperties = minecraftServer.getSaveProperties();
     Collection<String> collection = resourcePackManager.getEnabledNames();
@@ -115,13 +108,11 @@ public class GameRuleCustomCommand {
     resourcePackManager.scanPacks();
     Collection<String> collection2 = Lists.newArrayList(collection);
     Collection<String> collection3 = saveProperties.getDataPackSettings().getDisabled();
-    Iterator<String> var5 = resourcePackManager.getNames().iterator();
 
-    while(var5.hasNext()) {
-       String string = (String)var5.next();
-       if (!collection3.contains(string) && !collection2.contains(string)) {
-          collection2.add(string);
-       }
+    for (String string : resourcePackManager.getNames()) {
+      if (!collection3.contains(string) && !collection2.contains(string)) {
+        collection2.add(string);
+      }
     }
 
     return collection2;

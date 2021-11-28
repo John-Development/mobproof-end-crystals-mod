@@ -1,14 +1,7 @@
 package net.mobProofCrystals.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Properties;
-import java.util.Set;
  
 public class PropertiesCache {
   private final Properties configProp = new Properties();
@@ -44,23 +37,18 @@ public class PropertiesCache {
   public String getProperty(String key) {
     return configProp.getProperty(key);
   }
-  
-  public Set<String> getAllPropertyNames() {
-    return configProp.stringPropertyNames();
-  }
-  
-  public boolean containsKey(String key) {
-    return configProp.containsKey(key);
+
+  public int getIntProperty(String key) {
+    return Integer.parseInt(configProp.getProperty(key));
   }
 
   public void setProperty(String key, String i) {
     configProp.setProperty(key, i);
   }
    
-  public void flush() throws FileNotFoundException, IOException {
-    try (final OutputStream outputstream = new FileOutputStream(CONFIG_FILE);) {
+  public void flush() throws IOException {
+    try (final OutputStream outputstream = new FileOutputStream(CONFIG_FILE)) {
       configProp.store(outputstream, defaultConfig);
-      outputstream.close();
     }
   }
 }
