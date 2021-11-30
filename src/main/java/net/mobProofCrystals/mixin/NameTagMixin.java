@@ -42,6 +42,5 @@ public abstract class NameTagMixin {
 
       cir.setReturnValue(ActionResult.success(((PlayerEntity) (Object) this).world.isClient));
     }
-    return;
   }
 }

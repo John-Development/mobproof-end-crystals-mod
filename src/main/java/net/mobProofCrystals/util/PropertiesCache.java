@@ -136,7 +136,11 @@ public class PropertiesCache {
   public String getProperty(String key) {
     return configProp.getProperty(key);
   }
-  
+
+  public int getIntProperty(String key) {
+    return Integer.parseInt(configProp.getProperty(key));
+  }
+
   public Set<String> getAllPropertyNames() {
     return configProp.stringPropertyNames();
   }
@@ -149,10 +153,9 @@ public class PropertiesCache {
     configProp.setProperty(key, i);
   }
    
-  public void flush() throws FileNotFoundException, IOException {
-    try (final OutputStream outputstream = new FileOutputStream(worldFileRoute);) {
+  public void flush() throws IOException {
+    try (final OutputStream outputstream = new FileOutputStream(worldFileRoute)) {
       configProp.store(outputstream, defaultConfig);
-      outputstream.close();
     }
   }
 }
