@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.server.MinecraftServer;
@@ -13,6 +14,8 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.world.SaveProperties;
 import net.mobProofCrystals.util.PropertiesCache;
 
+import static net.minecraft.server.command.CommandManager.*;
+
 import java.io.IOException;
 import java.util.Collection;
 
@@ -20,9 +23,6 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class GameRuleCustomCommand {
-
-  private final PropertiesCache cache = PropertiesCache.getInstance();
-
   private static class LazyHolder {
     private static final GameRuleCustomCommand INSTANCE = new GameRuleCustomCommand();
   }
@@ -35,24 +35,42 @@ public class GameRuleCustomCommand {
     doEndCrystalsLimitSpawnInit();
   }
 
-  // Command example: /gamerule doEndCrystalsLimitSpawn <radius> <lowDistance> <name>
+  // Command example: /gamerule configEndCrystalsLimitSpawn <radius> <lowDistance> <name>
+  // Command example: /gamerule configDefaultEndCrystalsLimitSpawn <radius> <lowDistance> <name>
   private void doEndCrystalsLimitSpawnInit() {
     CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) ->
       dispatcher.register(literal("gamerule")
       .requires(source -> source.hasPermissionLevel(4))
-        .then(literal("doEndCrystalsLimitSpawn")
+        .then(literal("configEndCrystalsLimitSpawn")
           .then(argument("name", StringArgumentType.string())
-            .executes(this::executeCrystal)
+            .executes((context) -> executeCrystal(context, PropertiesCache.getInstance()))
           )
           .then(argument("radius", IntegerArgumentType.integer(1, 64))
             .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
-              .executes(this::executeCrystal)
+              .executes((context) -> executeCrystal(context, PropertiesCache.getInstance()))
             )
           )
           .then(argument("radius", IntegerArgumentType.integer(1, 64))
             .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
               .then(argument("name", StringArgumentType.string())
-                .executes(this::executeCrystal)
+                .executes((context) -> executeCrystal(context, PropertiesCache.getInstance()))
+              )
+            )
+          )
+        )
+        .then(literal("configDefaultEndCrystalsLimitSpawn")
+          .then(argument("name", StringArgumentType.string())
+            .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
+          )
+          .then(argument("radius", IntegerArgumentType.integer(1, 64))
+            .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
+              .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
+            )
+          )
+          .then(argument("radius", IntegerArgumentType.integer(1, 64))
+            .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
+              .then(argument("name", StringArgumentType.string())
+                .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
               )
             )
           )
@@ -61,11 +79,11 @@ public class GameRuleCustomCommand {
     );
   }
 
-  private int executeCrystal(CommandContext<ServerCommandSource> context) {
+  private int executeCrystal(CommandContext<ServerCommandSource> context, PropertiesCache cache) {
     int radius;
     int lowDistance;
     String name;
-    
+
     try {
       radius = IntegerArgumentType.getInteger(context, "radius");
       cache.setProperty("radius", Integer.toString(radius));
@@ -82,7 +100,7 @@ public class GameRuleCustomCommand {
         cache.setProperty("crystal-name", name);
       }
     } catch (Exception ignored) {}
-    
+
     try {
       cache.flush();
     } catch (IOException e) {
@@ -108,6 +126,7 @@ public class GameRuleCustomCommand {
     resourcePackManager.scanPacks();
     Collection<String> collection2 = Lists.newArrayList(collection);
     Collection<String> collection3 = saveProperties.getDataPackSettings().getDisabled();
+    Iterator<String> var5 = resourcePackManager.getNames().iterator();
 
     for (String string : resourcePackManager.getNames()) {
       if (!collection3.contains(string) && !collection2.contains(string)) {
