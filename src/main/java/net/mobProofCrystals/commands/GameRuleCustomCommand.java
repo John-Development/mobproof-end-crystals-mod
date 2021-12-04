@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.server.MinecraftServer;
@@ -13,8 +12,6 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.SaveProperties;
 import net.mobProofCrystals.util.PropertiesCache;
-
-import static net.minecraft.server.command.CommandManager.*;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -126,7 +123,6 @@ public class GameRuleCustomCommand {
     resourcePackManager.scanPacks();
     Collection<String> collection2 = Lists.newArrayList(collection);
     Collection<String> collection3 = saveProperties.getDataPackSettings().getDisabled();
-    Iterator<String> var5 = resourcePackManager.getNames().iterator();
 
     for (String string : resourcePackManager.getNames()) {
       if (!collection3.contains(string) && !collection2.contains(string)) {
