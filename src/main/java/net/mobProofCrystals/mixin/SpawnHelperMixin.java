@@ -58,7 +58,7 @@ public abstract class SpawnHelperMixin {
         EndCrystalEntity.class,
         box,
         crystal -> cache.getProperty("crystal-name").trim().isEmpty()
-          || cache.getProperty("crystal-name").equals(crystal.getName().asString())
+          || cache.getProperty("crystal-name").equals(crystal.getName().getString())
       );
 
       if (crystals != null && !crystals.isEmpty()) {

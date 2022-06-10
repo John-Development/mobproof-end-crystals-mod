@@ -4,12 +4,12 @@ import com.google.common.collect.Lists;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ReloadCommand;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.world.SaveProperties;
 import net.mobProofCrystals.util.PropertiesCache;
 
@@ -35,7 +35,7 @@ public class GameRuleCustomCommand {
   // Command example: /gamerule configEndCrystalsLimitSpawn <radius> <lowDistance> <name>
   // Command example: /gamerule configDefaultEndCrystalsLimitSpawn <radius> <lowDistance> <name>
   private void doEndCrystalsLimitSpawnInit() {
-    CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) ->
+    CommandRegistrationCallback.EVENT.register((dispatcher, dedicated, environment) ->
       dispatcher.register(literal("gamerule")
       .requires(source -> source.hasPermissionLevel(4))
         .then(literal("configEndCrystalsLimitSpawn")
@@ -114,7 +114,7 @@ public class GameRuleCustomCommand {
     SaveProperties saveProperties = minecraftServer.getSaveProperties();
     Collection<String> collection = resourcePackManager.getEnabledNames();
     Collection<String> collection2 = getResourcePacks(resourcePackManager, saveProperties, collection);
-    serverCommandSource.sendFeedback(new TranslatableText("commands.custom.reload.success"), true);
+    serverCommandSource.sendFeedback(Text.translatable("commands.custom.reload.success"), true);
     ReloadCommand.tryReloadDataPacks(collection2, serverCommandSource);
     return 1;
   }
