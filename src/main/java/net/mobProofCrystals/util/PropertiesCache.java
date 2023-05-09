@@ -95,6 +95,10 @@ public class PropertiesCache {
       this.setProperty("crystal-name", Constants.DEF_CRYSTAL_NAME);
       hasChanged = true;
     }
+    if (this.getProperty("render") == null){
+      this.setProperty("render", "false");
+      hasChanged = true;
+    }
 
     if (hasChanged) {
       //Write to the file
@@ -127,6 +131,10 @@ public class PropertiesCache {
 
   public String getProperty(String key) {
     return configProp.getProperty(key);
+  }
+
+  public boolean getBoolProperty(String key) {
+    return Boolean.parseBoolean(configProp.getProperty(key));
   }
 
   public int getIntProperty(String key) {

@@ -54,6 +54,8 @@ public abstract class SpawnHelperMixin {
         monsterZ - radius + 0.5
       );
 
+      System.out.println(monsterX + monsterY + monsterZ + box.toString());
+
       List<EndCrystalEntity> crystals = world.getEntitiesByClass(
         EndCrystalEntity.class,
         box,
