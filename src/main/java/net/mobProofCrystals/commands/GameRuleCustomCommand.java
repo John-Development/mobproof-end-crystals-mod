@@ -110,7 +110,7 @@ public class GameRuleCustomCommand {
     ServerCommandSource serverCommandSource = context.getSource();
     MinecraftServer minecraftServer = serverCommandSource.getServer();
     Collection<String> collection = getResourcePacks(minecraftServer);
-    serverCommandSource.sendFeedback(Text.translatable("commands.custom.reload.success"), true);
+    serverCommandSource.sendFeedback(() -> Text.translatable("commands.custom.reload.success"), true);
     ReloadCommand.tryReloadDataPacks(collection, serverCommandSource);
 
     return 1;
