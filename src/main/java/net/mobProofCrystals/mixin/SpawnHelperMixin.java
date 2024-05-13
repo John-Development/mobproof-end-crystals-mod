@@ -41,7 +41,7 @@ public abstract class SpawnHelperMixin {
 
       List<String> mobs = Arrays.asList(cache.getProperty("mobs").split("\\s*,\\s*"));
 
-      if (mobs.contains(group.getName()) || mobs.contains(spawnEntry.type.toString().split("entity.minecraft.")[1])) {
+      if (mobs.contains("all") || mobs.contains(group.getName()) || mobs.contains(spawnEntry.type.toString().split("entity.minecraft.")[1])) {
         double monsterX, monsterY, monsterZ;
         monsterX = blockPos.getX();
         monsterY = blockPos.getY();
