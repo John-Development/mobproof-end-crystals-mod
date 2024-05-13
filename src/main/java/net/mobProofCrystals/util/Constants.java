@@ -4,6 +4,7 @@ public class Constants {
     final public static String DEF_RAD = "32";
     final public static String DEF_LIM_DISTANCE = "1";
     final public static String DEF_CRYSTAL_NAME = "";
+    final public static String DEF_MOBS = "monster";
 
     final public static String CONFIG_DIRECTORY = "config/crystal";
     final public static String CONFIG_FILE = "%s.properties";

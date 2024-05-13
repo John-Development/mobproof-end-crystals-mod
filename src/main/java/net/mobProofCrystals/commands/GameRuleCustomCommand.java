@@ -36,42 +36,52 @@ public class GameRuleCustomCommand {
   private void doEndCrystalsLimitSpawnInit() {
     CommandRegistrationCallback.EVENT.register((dispatcher, dedicated, environment) ->
       dispatcher.register(literal("gamerule")
-      .requires(source -> source.hasPermissionLevel(4))
-        .then(literal("configEndCrystalsLimitSpawn")
-          .then(argument("name", StringArgumentType.string())
-            .executes((context) -> executeCrystal(context, PropertiesCache.getInstance()))
-          )
-          .then(argument("radius", IntegerArgumentType.integer(1, 64))
-            .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
+        .requires(source -> source.hasPermissionLevel(4))
+          .then(literal("configEndCrystalsLimitSpawn")
+            .then(argument("name", StringArgumentType.string())
               .executes((context) -> executeCrystal(context, PropertiesCache.getInstance()))
             )
-          )
-          .then(argument("radius", IntegerArgumentType.integer(1, 64))
-            .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
-              .then(argument("name", StringArgumentType.string())
+            .then(argument("radius", IntegerArgumentType.integer(1, 64))
+              .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
                 .executes((context) -> executeCrystal(context, PropertiesCache.getInstance()))
               )
             )
-          )
-        )
-        .then(literal("configDefaultEndCrystalsLimitSpawn")
-          .then(argument("name", StringArgumentType.string())
-            .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
-          )
-          .then(argument("radius", IntegerArgumentType.integer(1, 64))
-            .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
-              .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
-            )
-          )
-          .then(argument("radius", IntegerArgumentType.integer(1, 64))
-            .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
-              .then(argument("name", StringArgumentType.string())
-                .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
+            .then(argument("radius", IntegerArgumentType.integer(1, 64))
+              .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
+                .then(argument("name", StringArgumentType.string())
+                  .executes((context) -> executeCrystal(context, PropertiesCache.getInstance()))
+                )
               )
             )
           )
+          .then(literal("configDefaultEndCrystalsLimitSpawn")
+            .then(argument("name", StringArgumentType.string())
+              .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
+            )
+            .then(argument("radius", IntegerArgumentType.integer(1, 64))
+              .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
+                .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
+              )
+            )
+            .then(argument("radius", IntegerArgumentType.integer(1, 64))
+              .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
+                .then(argument("name", StringArgumentType.string())
+                  .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
+                )
+              )
+            )
+          )
+          .then(literal("configEndCrystalsMobs")
+            .then(argument("list", StringArgumentType.string())
+              .executes((context) -> executeCrystalMobList(context, PropertiesCache.getInstance()))
+            )
+          )
+          .then(literal("configDefaultEndCrystalsMobs")
+            .then(argument("list", StringArgumentType.string())
+              .executes((context) -> executeCrystalMobList(context, PropertiesCache.getDefaultInstance()))
+            )
+          )
         )
-      )
     );
   }
 
@@ -95,6 +105,23 @@ public class GameRuleCustomCommand {
       } else {
         cache.setProperty("crystal-name", name);
       }
+    } catch (Exception ignored) {}
+
+    try {
+      cache.flush();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return reload(context);
+  }
+
+  private int executeCrystalMobList(CommandContext<ServerCommandSource> context, PropertiesCache cache) {
+    String mobList;
+
+    try {
+      mobList = StringArgumentType.getString(context, "list");
+      cache.setProperty("mobs", mobList);
     } catch (Exception ignored) {}
 
     try {

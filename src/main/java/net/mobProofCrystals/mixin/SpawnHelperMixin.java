@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Mixin(SpawnHelper.class)
@@ -35,36 +36,40 @@ public abstract class SpawnHelperMixin {
     double squaredDistance,
     CallbackInfoReturnable<Boolean> cir
   ) {
-    if (group != null && group.compareTo(SpawnGroup.MONSTER) == 0) {
-      double monsterX, monsterY, monsterZ;
-      monsterX = blockPos.getX();
-      monsterY = blockPos.getY();
-      monsterZ = blockPos.getZ();
-
+    if (group != null) {
       PropertiesCache cache = PropertiesCache.getInstance();
-      int radius = cache.getIntProperty("radius");
-      int lowerLimitDistance = cache.getIntProperty("lower-limit-distance");
 
-      Box box = new Box(
-        monsterX + radius - 0.49,
-        monsterY + lowerLimitDistance,
-        monsterZ + radius - 0.49,
-        monsterX - radius + 0.5,
-        monsterY - 2 * radius - lowerLimitDistance + 3,
-        monsterZ - radius + 0.5
-      );
+      List<String> mobs = Arrays.asList(cache.getProperty("mobs").split("\\s*,\\s*"));
 
-      List<EndCrystalEntity> crystals = world.getEntitiesByClass(
-        EndCrystalEntity.class,
-        box,
-        crystal -> cache.getProperty("crystal-name").trim().isEmpty()
-          || cache.getProperty("crystal-name").equals(crystal.getName().getString())
-      );
+      if (mobs.contains("all") || mobs.contains(group.getName()) || mobs.contains(spawnEntry.type.toString().split("entity.minecraft.")[1])) {
+        double monsterX, monsterY, monsterZ;
+        monsterX = blockPos.getX();
+        monsterY = blockPos.getY();
+        monsterZ = blockPos.getZ();
 
-      if (crystals != null && !crystals.isEmpty()) {
-        cir.setReturnValue(false);
+        int radius = cache.getIntProperty("radius");
+        int lowerLimitDistance = cache.getIntProperty("lower-limit-distance");
+
+        Box box = new Box(
+          monsterX + radius - 0.49,
+          monsterY + lowerLimitDistance,
+          monsterZ + radius - 0.49,
+          monsterX - radius + 0.5,
+          monsterY - 2 * radius - lowerLimitDistance + 3,
+          monsterZ - radius + 0.5
+        );
+
+        List<EndCrystalEntity> crystals = world.getEntitiesByClass(
+          EndCrystalEntity.class,
+          box,
+          crystal -> cache.getProperty("crystal-name").trim().isEmpty()
+            || cache.getProperty("crystal-name").equals(crystal.getName().getString())
+        );
+
+        if (crystals != null && !crystals.isEmpty()) {
+          cir.setReturnValue(false);
+        }
       }
     }
   }
-  
 }
