@@ -87,12 +87,16 @@ public class PropertiesCache {
       this.setProperty("radius", Constants.DEF_RAD);
       hasChanged = true;
     }
-    if (this.getProperty("lower-limit-distance") == null){
+    if (this.getProperty("lower-limit-distance") == null) {
       this.setProperty("lower-limit-distance", Constants.DEF_LIM_DISTANCE);
       hasChanged = true;
     }
-    if (this.getProperty("crystal-name") == null){
+    if (this.getProperty("crystal-name") == null) {
       this.setProperty("crystal-name", Constants.DEF_CRYSTAL_NAME);
+      hasChanged = true;
+    }
+    if (this.getProperty("mobs") == null) {
+      this.setProperty("mobs", Constants.DEF_MOBS);
       hasChanged = true;
     }
 
