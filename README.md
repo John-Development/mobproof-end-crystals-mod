@@ -6,3 +6,16 @@ Each crystal you place in the world creates an area that starts from the block i
 
 
 The original idea of this concept is made by [ethnographie](https://www.planetminecraft.com/member/ethnographie/) and you cand find her datapack [here](https://www.planetminecraft.com/data-pack/mob-proof-crystals/).
+
+
+Mob list options:
+- all
+- monster
+- creature
+- ambient
+- axolotls
+- underground_water_creature
+- water_creature
+- water_ambient
+- misc
+- any specific mob name (bat, creeper, wandering_trader...)
