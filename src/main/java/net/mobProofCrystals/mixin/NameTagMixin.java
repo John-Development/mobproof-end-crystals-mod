@@ -1,5 +1,6 @@
 package net.mobProofCrystals.mixin;
 
+import net.minecraft.component.DataComponentTypes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,7 +17,6 @@ import net.mobProofCrystals.util.PropertiesCache;
 
 @Mixin(PlayerEntity.class)
 public abstract class NameTagMixin {
-
   @Inject(
     method = "interact",
     at = @At("RETURN"),
@@ -31,7 +31,7 @@ public abstract class NameTagMixin {
     PropertiesCache cache = PropertiesCache.getInstance();
 
     if (itemStack.getItem().getClass().equals(NameTagItem.class)
-    && itemStack.hasCustomName()
+    && itemStack.get(DataComponentTypes.CUSTOM_NAME) != null
     && entity instanceof EndCrystalEntity
     && !((EndCrystalEntity) entity).shouldShowBottom()
     && cache.getProperty("crystal-name").equals(itemStack.getName().getString())) {

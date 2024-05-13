@@ -146,10 +146,10 @@ public class GameRuleCustomCommand {
   private static Collection<String> getResourcePacks(MinecraftServer minecraftServer) {
     ResourcePackManager resourcePackManager = minecraftServer.getDataPackManager();
     resourcePackManager.scanPacks();
-    Collection<String> collection2 = Lists.newArrayList(resourcePackManager.getEnabledNames());
+    Collection<String> collection2 = Lists.newArrayList(resourcePackManager.getEnabledIds());
     Collection<String> collection3 = minecraftServer.getSaveProperties().getDataConfiguration().dataPacks().getDisabled();
 
-    for (String string : resourcePackManager.getNames()) {
+    for (String string : resourcePackManager.getIds()) {
       if (!collection3.contains(string) && !collection2.contains(string)) {
         collection2.add(string);
       }
