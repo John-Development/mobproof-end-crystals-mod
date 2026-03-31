@@ -5,18 +5,19 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.resource.ResourcePackManager;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ReloadCommand;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.server.commands.ReloadCommand;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.permissions.Permissions;
 import net.mobProofCrystals.util.PropertiesCache;
 
 import java.io.IOException;
 import java.util.Collection;
 
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
 
 public class GameRuleCustomCommand {
   private static class LazyHolder {
@@ -34,58 +35,58 @@ public class GameRuleCustomCommand {
   // Command example: /gamerule configEndCrystalsLimitSpawn <radius> <lowDistance> <name>
   // Command example: /gamerule configDefaultEndCrystalsLimitSpawn <radius> <lowDistance> <name>
   private void doEndCrystalsLimitSpawnInit() {
-    CommandRegistrationCallback.EVENT.register((dispatcher, dedicated, environment) ->
-      dispatcher.register(literal("gamerule")
-        .requires(source -> source.hasPermissionLevel(4))
-          .then(literal("configEndCrystalsLimitSpawn")
-            .then(argument("name", StringArgumentType.string())
-              .executes((context) -> executeCrystal(context, PropertiesCache.getInstance()))
+    CommandRegistrationCallback.EVENT.register((dispatcher, _, _) ->
+            dispatcher.register(literal("gamerule")
+                    .requires(source -> source.permissions().hasPermission(Permissions.COMMANDS_ADMIN))
+                    .then(literal("end_crystals_limit_spawn")
+                            .then(argument("name", StringArgumentType.string())
+                                    .executes((context) -> executeCrystal(context, PropertiesCache.getInstance()))
+                            )
+                            .then(argument("radius", IntegerArgumentType.integer(1, 64))
+                                    .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
+                                            .executes((context) -> executeCrystal(context, PropertiesCache.getInstance()))
+                                    )
+                            )
+                            .then(argument("radius", IntegerArgumentType.integer(1, 64))
+                                    .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
+                                            .then(argument("name", StringArgumentType.string())
+                                                    .executes((context) -> executeCrystal(context, PropertiesCache.getInstance()))
+                                            )
+                                    )
+                            )
+                    )
+                    .then(literal("default_end_crystals_limit_spawn")
+                            .then(argument("name", StringArgumentType.string())
+                                    .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
+                            )
+                            .then(argument("radius", IntegerArgumentType.integer(1, 64))
+                                    .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
+                                            .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
+                                    )
+                            )
+                            .then(argument("radius", IntegerArgumentType.integer(1, 64))
+                                    .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
+                                            .then(argument("name", StringArgumentType.string())
+                                                    .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
+                                            )
+                                    )
+                            )
+                    )
+                    .then(literal("end_crystals_mobs")
+                            .then(argument("list", StringArgumentType.string())
+                                    .executes((context) -> executeCrystalMobList(context, PropertiesCache.getInstance()))
+                            )
+                    )
+                    .then(literal("default_end_crystals_mobs")
+                            .then(argument("list", StringArgumentType.string())
+                                    .executes((context) -> executeCrystalMobList(context, PropertiesCache.getDefaultInstance()))
+                            )
+                    )
             )
-            .then(argument("radius", IntegerArgumentType.integer(1, 64))
-              .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
-                .executes((context) -> executeCrystal(context, PropertiesCache.getInstance()))
-              )
-            )
-            .then(argument("radius", IntegerArgumentType.integer(1, 64))
-              .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
-                .then(argument("name", StringArgumentType.string())
-                  .executes((context) -> executeCrystal(context, PropertiesCache.getInstance()))
-                )
-              )
-            )
-          )
-          .then(literal("configDefaultEndCrystalsLimitSpawn")
-            .then(argument("name", StringArgumentType.string())
-              .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
-            )
-            .then(argument("radius", IntegerArgumentType.integer(1, 64))
-              .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
-                .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
-              )
-            )
-            .then(argument("radius", IntegerArgumentType.integer(1, 64))
-              .then(argument("lowDistance", IntegerArgumentType.integer(-64, 64))
-                .then(argument("name", StringArgumentType.string())
-                  .executes((context) -> executeCrystal(context, PropertiesCache.getDefaultInstance()))
-                )
-              )
-            )
-          )
-          .then(literal("configEndCrystalsMobs")
-            .then(argument("list", StringArgumentType.string())
-              .executes((context) -> executeCrystalMobList(context, PropertiesCache.getInstance()))
-            )
-          )
-          .then(literal("configDefaultEndCrystalsMobs")
-            .then(argument("list", StringArgumentType.string())
-              .executes((context) -> executeCrystalMobList(context, PropertiesCache.getDefaultInstance()))
-            )
-          )
-        )
     );
   }
 
-  private int executeCrystal(CommandContext<ServerCommandSource> context, PropertiesCache cache) {
+  private int executeCrystal(CommandContext<CommandSourceStack> context, PropertiesCache cache) {
     int radius;
     int lowDistance;
     String name;
@@ -116,7 +117,7 @@ public class GameRuleCustomCommand {
     return reload(context);
   }
 
-  private int executeCrystalMobList(CommandContext<ServerCommandSource> context, PropertiesCache cache) {
+  private int executeCrystalMobList(CommandContext<CommandSourceStack> context, PropertiesCache cache) {
     String mobList;
 
     try {
@@ -133,23 +134,23 @@ public class GameRuleCustomCommand {
     return reload(context);
   }
 
-  private static int reload(CommandContext<ServerCommandSource> context) {
-    ServerCommandSource serverCommandSource = context.getSource();
+  private static int reload(CommandContext<CommandSourceStack> context) {
+    CommandSourceStack serverCommandSource = context.getSource();
     MinecraftServer minecraftServer = serverCommandSource.getServer();
     Collection<String> collection = getResourcePacks(minecraftServer);
-    serverCommandSource.sendFeedback(() -> Text.translatable("commands.custom.reload.success"), true);
-    ReloadCommand.tryReloadDataPacks(collection, serverCommandSource);
+    serverCommandSource.sendSuccess(() -> Component.translatable("commands.custom.reload.success"), true);
+    ReloadCommand.reloadPacks(collection, serverCommandSource);
 
     return 1;
   }
 
   private static Collection<String> getResourcePacks(MinecraftServer minecraftServer) {
-    ResourcePackManager resourcePackManager = minecraftServer.getDataPackManager();
-    resourcePackManager.scanPacks();
-    Collection<String> collection2 = Lists.newArrayList(resourcePackManager.getEnabledIds());
-    Collection<String> collection3 = minecraftServer.getSaveProperties().getDataConfiguration().dataPacks().getDisabled();
+    PackRepository resourcePackManager = minecraftServer.getPackRepository();
+    resourcePackManager.reload();
+    Collection<String> collection2 = Lists.newArrayList(resourcePackManager.getSelectedIds());
+    Collection<String> collection3 = minecraftServer.getWorldData().getDataConfiguration().dataPacks().getDisabled();
 
-    for (String string : resourcePackManager.getIds()) {
+    for (String string : resourcePackManager.getAvailableIds()) {
       if (!collection3.contains(string) && !collection2.contains(string)) {
         collection2.add(string);
       }

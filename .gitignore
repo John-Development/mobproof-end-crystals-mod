@@ -31,4 +31,5 @@ bin/
 # fabric
 
 run/
+runServer/
 run_16.7z

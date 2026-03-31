@@ -1,14 +1,14 @@
 package net.mobProofCrystals.mixin;
 
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.SpawnHelper;
-import net.minecraft.world.biome.SpawnSettings;
-import net.minecraft.world.gen.StructureAccessor;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+import net.minecraft.world.level.NaturalSpawner;
+import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.phys.AABB;
 import net.mobProofCrystals.util.PropertiesCache;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,59 +18,56 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Arrays;
 import java.util.List;
 
-@Mixin(SpawnHelper.class)
+@Mixin(NaturalSpawner.class)
 public abstract class SpawnHelperMixin {
-
   @Inject(
-    method = "canSpawn(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/SpawnGroup;Lnet/minecraft/world/gen/StructureAccessor;Lnet/minecraft/world/gen/chunk/ChunkGenerator;Lnet/minecraft/world/biome/SpawnSettings$SpawnEntry;Lnet/minecraft/util/math/BlockPos$Mutable;D)Z",
-    at = @At("HEAD"),
-    cancellable = true
+          method = "canSpawnMobAt",
+          at = @At("HEAD"),
+          cancellable = true
   )
   private static void handleCustomSpawnRestriction(
-    ServerWorld world,
-    SpawnGroup group,
-    StructureAccessor pAccessor,
-    ChunkGenerator chunkGenerator,
-    SpawnSettings.SpawnEntry spawnEntry,
-    BlockPos.Mutable blockPos,
-    double squaredDistance,
-    CallbackInfoReturnable<Boolean> cir
+          ServerLevel level,
+          StructureManager structureManager,
+          ChunkGenerator generator,
+          MobCategory mobCategory,
+          MobSpawnSettings.SpawnerData spawnerData,
+          BlockPos pos,
+          CallbackInfoReturnable<Boolean> cir
   ) {
-    if (group != null) {
+    if (mobCategory != null) {
       PropertiesCache cache = PropertiesCache.getInstance();
 
       List<String> mobs = Arrays.asList(cache.getProperty("mobs").split("\\s*,\\s*"));
 
-      if (mobs.contains("all") || mobs.contains(group.getName()) || mobs.contains(spawnEntry.type.toString().split("entity.minecraft.")[1])) {
+      if (mobs.contains("all") || mobs.contains(mobCategory.getName()) || mobs.contains(spawnerData.type().toString().split("entity.minecraft.")[1])) {
         double monsterX, monsterY, monsterZ;
-        monsterX = blockPos.getX();
-        monsterY = blockPos.getY();
-        monsterZ = blockPos.getZ();
+        monsterX = pos.getX();
+        monsterY = pos.getY();
+        monsterZ = pos.getZ();
 
         int radius = cache.getIntProperty("radius");
         int lowerLimitDistance = cache.getIntProperty("lower-limit-distance");
 
-        Box box = new Box(
-          monsterX + radius - 0.49,
-          monsterY + lowerLimitDistance,
-          monsterZ + radius - 0.49,
-          monsterX - radius + 0.5,
-          monsterY - 2 * radius - lowerLimitDistance + 3,
-          monsterZ - radius + 0.5
+        AABB box = new AABB(
+                monsterX + radius - 0.49,
+                monsterY + lowerLimitDistance,
+                monsterZ + radius - 0.49,
+                monsterX - radius + 0.5,
+                monsterY - 2 * radius - lowerLimitDistance + 3,
+                monsterZ - radius + 0.5
         );
 
-        List<EndCrystalEntity> crystals = world.getEntitiesByClass(
-          EndCrystalEntity.class,
-          box,
-          crystal -> cache.getProperty("crystal-name").trim().isEmpty()
-            || cache.getProperty("crystal-name").equals(crystal.getName().getString())
+        List<EndCrystal> crystals = level.getEntitiesOfClass(
+                EndCrystal.class,
+                box,
+                crystal -> cache.getProperty("crystal-name").trim().isEmpty()
+                        || cache.getProperty("crystal-name").equals(crystal.getName().getString())
         );
 
-        if (crystals != null && !crystals.isEmpty()) {
+        if (!crystals.isEmpty()) {
           cir.setReturnValue(false);
         }
       }
     }
   }
-  
 }

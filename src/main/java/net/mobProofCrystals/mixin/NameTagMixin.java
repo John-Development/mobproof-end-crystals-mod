@@ -1,46 +1,47 @@
 package net.mobProofCrystals.mixin;
 
-import net.minecraft.component.DataComponentTypes;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.NameTagItem;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.NameTagItem;
 import net.mobProofCrystals.util.PropertiesCache;
 
-@Mixin(PlayerEntity.class)
+@Mixin(Player.class)
 public abstract class NameTagMixin {
   @Inject(
-    method = "interact",
-    at = @At("RETURN"),
-    cancellable = true
+          method = "interactOn",
+          at = @At("RETURN"),
+          cancellable = true
   )
   public void setCustomNameTag(
-    Entity entity,
-    Hand hand,
-    CallbackInfoReturnable<ActionResult> cir
+          Entity entity,
+          InteractionHand hand,
+          Vec3 location,
+          CallbackInfoReturnable<InteractionResult> cir
   ) {
-    ItemStack itemStack = ((PlayerEntity) (Object) this).getStackInHand(hand);
+    ItemStack itemStack = ((Player) (Object) this).getItemInHand(hand);
     PropertiesCache cache = PropertiesCache.getInstance();
 
     if (itemStack.getItem().getClass().equals(NameTagItem.class)
-    && itemStack.get(DataComponentTypes.CUSTOM_NAME) != null
-    && entity instanceof EndCrystalEntity
-    && !((EndCrystalEntity) entity).shouldShowBottom()
-    && cache.getProperty("crystal-name").equals(itemStack.getName().getString())) {
-      entity.setCustomName(itemStack.getName());
+            && itemStack.get(DataComponents.CUSTOM_NAME) != null
+            && entity instanceof EndCrystal
+            && !((EndCrystal) entity).showsBottom()
+            && cache.getProperty("crystal-name").equals(itemStack.getHoverName().getString())) {
+      entity.setCustomName(itemStack.getHoverName());
 
-      itemStack.decrement(1);
+      itemStack.shrink(1);
       entity.setCustomNameVisible(true);
 
-      cir.setReturnValue(ActionResult.success(((PlayerEntity) (Object) this).getWorld().isClient));
+      cir.setReturnValue(((Player) (Object) this).level().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
     }
   }
 }
